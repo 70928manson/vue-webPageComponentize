@@ -1,9 +1,13 @@
 import { createApp } from "https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.26/vue.esm-browser.min.js";
+import pagination from './pagination.js';
 
 let productModal = {};
 let delProductModal = {};
 
 const app = createApp({
+    components: {
+        pagination,
+    },
     data() {
         return {
             url: 'https://vue3-course-api.hexschool.io/v2',
@@ -14,6 +18,7 @@ const app = createApp({
                 imagesUrl: [],
             },
             isNew: false,
+            pagination: {},  //分頁
         }
     },
     methods: {
@@ -30,11 +35,13 @@ const app = createApp({
                     window.location = 'index.html';
                 })
         },
-        getProductsData() {
+        getProductsData(page = 1) {  //參數預設值 (api post)
+            const url = `${this.url}/api/${this.api_Path}/admin/products/?page=${page}`;    //?後面帶query參數
             axios.get(`${this.url}/api/${this.api_Path}/admin/products`)
                 .then((res) => {
                     const { products } = res.data;
                     this.products = products;
+                    this.pagination = res.data.pagination; //分頁
                 })
                 .catch((err) => {
                     alert(err.data.message);
@@ -58,28 +65,6 @@ const app = createApp({
                 delProductModal.show();
                 this.tempProduct = { ...product } //注意淺拷貝問題
             }
-        },
-        updateProduct() {
-            let url = `${this.url}/api/${this.api_Path}/admin/product`;
-            let method = 'post';
-
-            //若為編輯情況，url和method被替換
-            if(!this.isNew){
-               url = `${this.url}/api/${this.api_Path}/admin/product/${this.tempProduct.id}`;
-               method = 'put';
-            }
-
-            axios[method](url, { data: this.tempProduct })
-                .then((res) => {
-                    console.log(res);
-
-                    this.getProductsData();
-                    productModal.hide();
-                })
-                .catch((err) => {
-                    alert(err.data.message);
-                    console.log(err);
-                })
         },
         deletProduct() {
             let url = `${this.url}/api/${this.api_Path}/admin/product/${this.tempProduct.id}`;
@@ -108,4 +93,31 @@ const app = createApp({
     }
 });
 
+app.component('productModal', {
+    props: ['tempProduct'],
+    template: '#templateForProductModal',
+    methods: {
+        updateProduct() {
+            let url = `${this.url}/api/${this.api_Path}/admin/product`;
+            let method = 'post';
+
+            //若為編輯情況，url和method被替換
+            if(!this.isNew){
+               url = `${this.url}/api/${this.api_Path}/admin/product/${this.tempProduct.id}`;
+               method = 'put';
+            }
+
+            axios[method](url, { data: this.tempProduct })
+                .then((res) => {
+                    console.log(res);
+                    this.$emit('get-products-data');
+                    productModal.hide();
+                })
+                .catch((err) => {
+                    alert(err.data.message);
+                    console.log(err);
+                })
+        },
+    }
+})
 app.mount('#app');
