@@ -58,7 +58,7 @@ const app = createApp({
                 productModal.show();
                 this.isNew = true;
             }else if(status === 'edit'){
-                this.tempProduct = { ...product } //注意淺拷貝問題
+                this.tempProduct = { imagesUrl: [], ...product }; //注意淺拷貝問題、加上imagesUrl避免編輯產品時無法新增多圖
                 productModal.show();
                 this.isNew = false;
             }else if(status === 'delete'){
