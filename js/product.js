@@ -18,7 +18,7 @@ const app = createApp({
                 imagesUrl: [],
             },
             isNew: false,
-            pagination: {},  //分頁
+            pagination: {},  //分頁元件
         }
     },
     methods: {
@@ -93,7 +93,14 @@ const app = createApp({
     }
 });
 
+//產品新增/編輯 元件
 app.component('productModal', {
+    data() {
+        return {
+            url: 'https://vue3-course-api.hexschool.io/v2',
+            api_Path: 'manson972',
+        }
+    },
     props: ['tempProduct'],
     template: '#templateForProductModal',
     methods: {
@@ -118,6 +125,33 @@ app.component('productModal', {
                     console.log(err);
                 })
         },
+    }
+})
+
+app.component('delProductModal', {
+    data() {
+        return {
+            url: 'https://vue3-course-api.hexschool.io/v2',
+            api_Path: 'manson972',
+        }
+    },
+    props: ['tempProduct'],
+    template: '#templateForDelProductModal',
+    methods: {
+        deletProduct() {
+            let url = `${this.url}/api/${this.api_Path}/admin/product/${this.tempProduct.id}`;
+
+            axios.delete(url)
+                .then((res) => {
+                    console.log(res);
+                    this.$emit('get-products-data');
+                    delProductModal.hide();
+                })
+                .catch((err) => {
+                    alert(err.data.message);
+                    console.log(err);
+                })
+        }
     }
 })
 app.mount('#app');
