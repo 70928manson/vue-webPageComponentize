@@ -2,6 +2,7 @@ import { createApp } from "https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.26/vue
 import pagination from './pagination.js';
 
 let productModal = {};
+let editProductModal = {};
 let delProductModal = {};
 
 const app = createApp({
@@ -36,6 +37,7 @@ const app = createApp({
                 })
         },
         getProductsData(page = 1) {  //參數預設值 (api post)
+            //query
             const url = `${this.url}/api/${this.api_Path}/admin/products/?page=${page}`;    //?後面帶query參數
             axios.get(`${this.url}/api/${this.api_Path}/admin/products`)
                 .then((res) => {
@@ -66,7 +68,7 @@ const app = createApp({
                 this.tempProduct = { ...product } //注意淺拷貝問題
             }
         },
-        deletProduct() {
+        deleteProduct() {
             let url = `${this.url}/api/${this.api_Path}/admin/product/${this.tempProduct.id}`;
 
             axios.delete(url)
@@ -93,7 +95,7 @@ const app = createApp({
     }
 });
 
-//產品新增/編輯 元件
+//產品新增 元件
 app.component('productModal', {
     data() {
         return {
@@ -101,10 +103,14 @@ app.component('productModal', {
             api_Path: 'manson972',
         }
     },
-    props: ['tempProduct'],
+    props: ['tempProduct', 'isNew'],
     template: '#templateForProductModal',
     methods: {
         updateProduct() {
+            //重點: 得到app 中isNew的狀態 判斷要新增還是更新 !
+            console.log(this.isNew);
+
+            //預設 新增狀態
             let url = `${this.url}/api/${this.api_Path}/admin/product`;
             let method = 'post';
 
@@ -113,7 +119,13 @@ app.component('productModal', {
                url = `${this.url}/api/${this.api_Path}/admin/product/${this.tempProduct.id}`;
                method = 'put';
             }
+            // //put更新 post新增
 
+            // url = `${this.url}/api/${this.api_Path}/admin/product`;
+            // method = 'post';
+
+            console.log(method); //post
+            
             axios[method](url, { data: this.tempProduct })
                 .then((res) => {
                     console.log(res);
@@ -138,8 +150,10 @@ app.component('delProductModal', {
     props: ['tempProduct'],
     template: '#templateForDelProductModal',
     methods: {
-        deletProduct() {
+        deleteProduct() {
             let url = `${this.url}/api/${this.api_Path}/admin/product/${this.tempProduct.id}`;
+
+            console.log(url);
 
             axios.delete(url)
                 .then((res) => {

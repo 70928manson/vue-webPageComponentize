@@ -73,7 +73,8 @@
            aria-hidden="true">
            <!-- get-products-data emit, getProductsData -->
            <product-modal 
-             :temp-product="tempProduct" 
+             :temp-product="tempProduct"
+             :is-new="isNew"
              v-on:get-products-data="getProductsData"></product-modal>
       </div>
 
@@ -91,7 +92,8 @@
           <div class="modal-content border-0">
             <div class="modal-header bg-dark text-white">
               <h5 id="productModalLabel" class="modal-title">
-                <span>新增產品</span>
+                <span v-if="isNew">新增產品</span>
+                <span v-else>編輯產品</span>
               </h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -204,7 +206,7 @@
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
               取消
             </button>
-            <button type="button" class="btn btn-danger" @click="deletProduct">
+            <button type="button" class="btn btn-danger" @click="deleteProduct">
               確認刪除
             </button>
           </div>
